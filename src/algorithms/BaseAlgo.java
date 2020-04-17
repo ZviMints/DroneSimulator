@@ -9,8 +9,9 @@ import java.awt.*;
 public interface BaseAlgo {
     enum mapState {blocked, explored, unexplored, visited}
     String getAlgoName();
-    boolean is_risky = false;
-    double risky_dis = 0;
+    boolean getRiskyState();
+    double getRiskyDist();
+    double getSpeed();
     Graph graph = new Graph();
     void play();
     void speedUp();

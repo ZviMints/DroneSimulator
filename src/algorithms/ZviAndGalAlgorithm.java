@@ -273,6 +273,19 @@ public class ZviAndGalAlgorithm implements BaseAlgo {
         drone.play();
         cpu.play();
     }
+    @Override
+    public boolean getRiskyState() {
+        return this.risky;
+    }
+    @Override
+    public double getRiskyDist() {
+        return this.risky_dis;
+    }
+    @Override
+    public double getSpeed(){
+        return drone.speed;
+    }
+
 
     // =========================== Main Method =============================== //
     public void Think() {

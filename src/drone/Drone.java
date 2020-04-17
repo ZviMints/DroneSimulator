@@ -26,7 +26,7 @@ public class Drone {
     private String drone_img_path = Config.root + "drone_3_pixels.png";
     public Map map;
     private double rotation;
-    private double speed;
+    public double speed;
     private CPU cpu;
 
     public Drone(Map map) {

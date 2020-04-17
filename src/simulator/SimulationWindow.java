@@ -215,7 +215,7 @@ public class SimulationWindow {
 
     public JLabel info_label2;
     public static boolean toogleRealMap = true;
-    public static boolean toogleAI = false;
+    public static boolean toogleAI = true;
 
     public static BaseAlgo algorithm;
 
@@ -251,8 +251,9 @@ public class SimulationWindow {
         info_label.setText(algorithm.getDrone().getInfoHTML());
         info_label2.setText(
                 "<html>" +
-                        "isRisky: " + algorithm.is_risky + "<br>"
-                        + "riskyDistance: " + algorithm.risky_dis
+                        "Speed: " + algorithm.getSpeed() + "<br>"
+                        + "isRisky: " + algorithm.getRiskyState() + "<br>"
+                        + "riskyDistance: " + algorithm.getRiskyDist()
                         + "</html>");
 
     }

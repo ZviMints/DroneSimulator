@@ -513,6 +513,18 @@ public class Algorithm implements BaseAlgo {
 		Point p2 = points.get(points.size()-2);
 		return new Point((p1.x + p2.x) /2, (p1.y + p2.y) /2);
 	}
-	
+
+	@Override
+	public boolean getRiskyState() {
+		return this.is_risky;
+	}
+	@Override
+	public double getRiskyDist() {
+		return this.risky_dis;
+	}
+	@Override
+	public double getSpeed(){
+		return drone.speed;
+	}
 
 }
