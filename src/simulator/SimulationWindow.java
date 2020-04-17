@@ -180,13 +180,6 @@ public class SimulationWindow {
         returnBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 return_home = !return_home;
-                algorithm.speedDown();
-                algorithm.spinBy(180, true, new Func() {
-                    @Override
-                    public void method() {
-                        algorithm.speedUp();
-                    }
-                });
             }
         });
         returnBtn.setBounds(1500, 400, 120, 50);
@@ -262,12 +255,5 @@ public class SimulationWindow {
                         + "riskyDistance: " + algorithm.risky_dis
                         + "</html>");
 
-    }
-
-    public void stopCPUS() {
-        CPU.stopAllCPUS();
-    }
-    public void resumseCPUS() {
-        CPU.stopAllCPUS();
     }
 }

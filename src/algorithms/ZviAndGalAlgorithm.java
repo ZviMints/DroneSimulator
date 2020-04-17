@@ -1,92 +1,46 @@
 package algorithms;
 
-import configurations.WorldParams;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.util.ArrayList;
+
 import cpu.CPU;
 import drone.Drone;
-import map.Map;
-import map.Tools;
-import models.Point;
 import simulator.Func;
 import simulator.Lidar;
+import map.Map;
+import map.Tools;
+import configurations.WorldParams;
+import models.Point;
 import simulator.SimulationWindow;
-
-import java.awt.*;
-import java.util.ArrayList;
 
 public class ZviAndGalAlgorithm implements BaseAlgo {
 
     int map_size = 3000;
 
-    enum PixelState {blocked, explored, unexplored, visited}
-    public PixelState map[][];
-
+    public mapState map[][];
     public Drone drone;
     public Point droneStartingPoint;
 
     ArrayList<Point> points;
 
+
     int isRotating;
     ArrayList<Double> degrees_left;
     ArrayList<Func> degrees_left_func;
 
-    enum SpeedStates {speedUp, speedDown, remain}
-    public SpeedStates speed_state = SpeedStates.remain;
-
     CPU ai_cpu;
 
-    public ZviAndGalAlgorithm(Map realMap) {
-        degrees_left = new ArrayList<>();
-        degrees_left_func = new ArrayList<>();
-        points = new ArrayList<>();
-
-        drone = new Drone(realMap);
-        drone.addLidar(0);
-        drone.addLidar(90);
-        drone.addLidar(-90);
-
-
-        initMap();
-
-        isRotating = 0;
-        ai_cpu = new CPU(200, "Auto_AI");
-        ai_cpu.addFunction(this::update);
-    }
 
     public void initMap() {
-        map = new PixelState[map_size][map_size];
+        map = new mapState[map_size][map_size];
         for (int i = 0; i < map_size; i++) {
             for (int j = 0; j < map_size; j++) {
-                map[i][j] = PixelState.unexplored;
+                map[i][j] = mapState.unexplored;
             }
         }
 
         droneStartingPoint = new Point(map_size / 2, map_size / 2);
-    }
-
-    public void play() {
-        drone.play();
-        ai_cpu.play();
-    }
-
-
-    public void update(int deltaTime) {
-        updateVisited();
-        updateMapByLidars();
-
-        ai();
-
-
-        if (isRotating != 0) {
-            updateRotating(deltaTime);
-        }
-        if (speed_state == SpeedStates.speedUp) {
-            drone.speedUp(deltaTime);
-            speed_state = SpeedStates.remain;
-        } else if (speed_state == SpeedStates.speedDown) {
-            drone.slowDown(deltaTime);
-            speed_state = SpeedStates.remain;
-        }
-
     }
 
 
@@ -100,12 +54,12 @@ public class ZviAndGalAlgorithm implements BaseAlgo {
             //rotation = Drone.Drone.formatRotation(rotation);
             for (int distanceInCM = 0; distanceInCM < lidar.current_distance; distanceInCM++) {
                 Point p = Tools.getPointByDistance(fromPoint, rotation, distanceInCM);
-                setPixel(p.x, p.y, PixelState.explored);
+                setPixel(p.x, p.y, mapState.explored);
             }
 
             if (lidar.current_distance > 0 && lidar.current_distance < WorldParams.lidarLimit - WorldParams.lidarNoise) {
                 Point p = Tools.getPointByDistance(fromPoint, rotation, lidar.current_distance);
-                setPixel(p.x, p.y, PixelState.blocked);
+                setPixel(p.x, p.y, mapState.blocked);
             }
         }
     }
@@ -114,20 +68,20 @@ public class ZviAndGalAlgorithm implements BaseAlgo {
         Point dronePoint = drone.getOpticalSensorLocation();
         Point fromPoint = new Point(dronePoint.x + droneStartingPoint.x, dronePoint.y + droneStartingPoint.y);
 
-        setPixel(fromPoint.x, fromPoint.y, PixelState.visited);
+        setPixel(fromPoint.x, fromPoint.y, mapState.visited);
 
     }
 
-    public void setPixel(double x, double y, PixelState state) {
+    public void setPixel(double x, double y, mapState state) {
         int xi = (int) x;
         int yi = (int) y;
 
-        if (state == PixelState.visited) {
+        if (state == mapState.visited) {
             map[xi][yi] = state;
             return;
         }
 
-        if (map[xi][yi] == PixelState.unexplored) {
+        if (map[xi][yi] == mapState.unexplored) {
             map[xi][yi] = state;
         }
     }
@@ -141,12 +95,12 @@ public class ZviAndGalAlgorithm implements BaseAlgo {
             int j = (int) droneStartingPoint.x - (int) drone.startPoint.y;
             int startX = j;
             for (; j < map_size; j++) {
-                if (map[i][j] != PixelState.unexplored) {
-                    if (map[i][j] == PixelState.blocked) {
+                if (map[i][j] != mapState.unexplored) {
+                    if (map[i][j] == mapState.blocked) {
                         g.setColor(Color.RED);
-                    } else if (map[i][j] == PixelState.explored) {
+                    } else if (map[i][j] == mapState.explored) {
                         g.setColor(Color.YELLOW);
-                    } else if (map[i][j] == PixelState.visited) {
+                    } else if (map[i][j] == mapState.visited) {
                         g.setColor(Color.BLUE);
                     }
                     g.drawLine(i - startY, j - startX, i - startY, j - startX);
@@ -164,22 +118,8 @@ public class ZviAndGalAlgorithm implements BaseAlgo {
 
     }
 
-    public void paint(Graphics g) {
-        if (SimulationWindow.toogleRealMap) {
-            drone.map.paint(g);
-        }
 
-        paintBlindMap(g);
-        paintPoints(g);
-
-        drone.paint(g);
-
-
-    }
-
-    boolean is_init = true;
-    boolean isLeftRightRotationEnable = true;
-
+    boolean justInitialized = true;
 
     public boolean is_risky = false;
     public int max_risky_distance = 150;
@@ -189,50 +129,33 @@ public class ZviAndGalAlgorithm implements BaseAlgo {
 
     boolean is_lidars_max = false;
 
-
     double max_distance_between_points = 100;
 
-    Point init_point;
+    Point currentPoint;
 
-    public void ai() {
-        if (!SimulationWindow.toogleAI) {
-            return;
-        }
+    public void Think(int deltaTime) {
+        if (SimulationWindow.toogleAI) {
 
-
-        if (is_init) {
-            speedUp();
+        if (justInitialized) {
             Point dronePoint = drone.getOpticalSensorLocation();
-            init_point = new Point(dronePoint);
+            currentPoint = new Point(dronePoint);
             points.add(dronePoint);
             graph.addVertex(dronePoint);
-            is_init = false;
-        }
-
-        if (isLeftRightRotationEnable) {
-            //doLeftRight();
+            justInitialized = false;
         }
 
 
         Point dronePoint = drone.getOpticalSensorLocation();
 
-
         if (SimulationWindow.return_home) {
-
-            if (Tools.getDistanceBetweenPoints(getLastPoint(), dronePoint) < max_distance_between_points) {
-                if (points.size() <= 1 && Tools.getDistanceBetweenPoints(getLastPoint(), dronePoint) < max_distance_between_points / 5) {
-                    speedDown();
-                } else {
-                    removeLastPoint();
-                }
-            }
+            System.out.println("[Drone] I Dont want return to home.");
+            SimulationWindow.return_home = false;
         } else {
             if (Tools.getDistanceBetweenPoints(getLastPoint(), dronePoint) >= max_distance_between_points) {
                 points.add(dronePoint);
                 graph.addVertex(dronePoint);
             }
         }
-
 
         if (!is_risky) {
             Lidar lidar = drone.lidars.get(0);
@@ -313,65 +236,61 @@ public class ZviAndGalAlgorithm implements BaseAlgo {
                 });
             }
         }
-
-        //}
     }
-
+}
     double lastGyroRotation = 0;
 
     public void updateRotating(int deltaTime) {
+        if (degrees_left.size() != 0) {
 
-        if (degrees_left.size() == 0) {
-            return;
-        }
-
-        double degrees_left_to_rotate = degrees_left.get(0);
-        boolean isLeft = true;
-        if (degrees_left_to_rotate > 0) {
-            isLeft = false;
-        }
-
-        double curr = drone.getGyroRotation();
-        double just_rotated = 0;
-
-        if (isLeft) {
-
-            just_rotated = curr - lastGyroRotation;
-            if (just_rotated > 0) {
-                just_rotated = -(360 - just_rotated);
+            double degrees_left_to_rotate = degrees_left.get(0);
+            boolean isLeft = true;
+            if (degrees_left_to_rotate > 0) {
+                isLeft = false;
             }
-        } else {
-            just_rotated = curr - lastGyroRotation;
-            if (just_rotated < 0) {
-                just_rotated = 360 + just_rotated;
+
+            double curr = drone.getGyroRotation();
+            double just_rotated = 0;
+
+            if (isLeft) {
+
+                just_rotated = curr - lastGyroRotation;
+                if (just_rotated > 0) {
+                    just_rotated = -(360 - just_rotated);
+                }
+            } else {
+                just_rotated = curr - lastGyroRotation;
+                if (just_rotated < 0) {
+                    just_rotated = 360 + just_rotated;
+                }
             }
-        }
 
 
-        lastGyroRotation = curr;
-        degrees_left_to_rotate -= just_rotated;
-        degrees_left.remove(0);
-        degrees_left.add(0, degrees_left_to_rotate);
-
-        if ((isLeft && degrees_left_to_rotate >= 0) || (!isLeft && degrees_left_to_rotate <= 0)) {
+            lastGyroRotation = curr;
+            degrees_left_to_rotate -= just_rotated;
             degrees_left.remove(0);
+            degrees_left.add(0, degrees_left_to_rotate);
 
-            Func func = degrees_left_func.get(0);
-            if (func != null) {
-                func.method();
+            if ((isLeft && degrees_left_to_rotate >= 0) || (!isLeft && degrees_left_to_rotate <= 0)) {
+                degrees_left.remove(0);
+
+                Func func = degrees_left_func.get(0);
+                if (func != null) {
+                    func.method();
+                }
+                degrees_left_func.remove(0);
+
+
+                if (degrees_left.size() == 0) {
+                    isRotating = 0;
+                }
+                return;
             }
-            degrees_left_func.remove(0);
 
+            int direction = (int) (degrees_left_to_rotate / Math.abs(degrees_left_to_rotate));
+            drone.rotateLeft(deltaTime * direction);
 
-            if (degrees_left.size() == 0) {
-                isRotating = 0;
-            }
-            return;
         }
-
-        int direction = (int) (degrees_left_to_rotate / Math.abs(degrees_left_to_rotate));
-        drone.rotateLeft(deltaTime * direction);
-
     }
 
     public void spinBy(double degrees, boolean isFirst, Func func) {
@@ -389,7 +308,22 @@ public class ZviAndGalAlgorithm implements BaseAlgo {
         isRotating = 1;
     }
 
-	public void spinBy(double degrees) {
+    public void spinBy(double degrees, boolean isFirst) {
+        lastGyroRotation = drone.getGyroRotation();
+        if (isFirst) {
+            degrees_left.add(0, degrees);
+            degrees_left_func.add(0, null);
+
+
+        } else {
+            degrees_left.add(degrees);
+            degrees_left_func.add(null);
+        }
+
+        isRotating = 1;
+    }
+
+    public void spinBy(double degrees) {
         lastGyroRotation = drone.getGyroRotation();
         degrees_left.add(degrees);
         degrees_left_func.add(null);
@@ -398,7 +332,7 @@ public class ZviAndGalAlgorithm implements BaseAlgo {
 
     public Point getLastPoint() {
         if (points.size() == 0) {
-            return init_point;
+            return currentPoint;
         }
 
         Point p1 = points.get(points.size() - 1);
@@ -407,7 +341,7 @@ public class ZviAndGalAlgorithm implements BaseAlgo {
 
     public Point removeLastPoint() {
         if (points.isEmpty()) {
-            return init_point;
+            return currentPoint;
         }
 
         return points.remove(points.size() - 1);
@@ -416,23 +350,91 @@ public class ZviAndGalAlgorithm implements BaseAlgo {
 
     public Point getAvgLastPoint() {
         if (points.size() < 2) {
-            return init_point;
+            return currentPoint;
         }
 
         Point p1 = points.get(points.size() - 1);
         Point p2 = points.get(points.size() - 2);
         return new Point((p1.x + p2.x) / 2, (p1.y + p2.y) / 2);
     }
-	// =========================== Working Functions =============================== //
-    @Override
-    public void speedUp() { speed_state = SpeedStates.speedUp; }
 
-	@Override
-    public void speedDown() {  speed_state = SpeedStates.speedDown;  }
+
+    // =========================== Constructor =========================== //
+    public ZviAndGalAlgorithm(Map realMap) {
+        System.out.println("Initialize " + getAlgoName() + " Algorithm");
+
+        degrees_left = new ArrayList<>();
+        degrees_left_func = new ArrayList<>();
+        points = new ArrayList<>();
+
+        // Adding Drone And Lidars
+        drone = new Drone(realMap);
+        drone.addLidar(0);
+        drone.addLidar(90);
+        drone.addLidar(-90);
+
+        initMap();
+
+        isRotating = 0;
+        ai_cpu = new CPU(200, "Auto_AI");
+        ai_cpu.addFunction(this::update);
+    }
+
+    // ===========================  Functions =============================== //
+    enum SpeedStates {speedUp, speedDown, remain}
+
+    public SpeedStates speed_state = SpeedStates.remain;
+
+    public void paint(Graphics g) {
+        if (SimulationWindow.toogleRealMap) drone.map.paint(g);
+        paintBlindMap(g);
+        paintPoints(g);
+        drone.paint(g);
+    }
+
+    public void update(int deltaTime) {
+        updateVisited();
+        updateMapByLidars();
+        Think(deltaTime);
+
+        if (isRotating != 0) updateRotating(deltaTime);
+
+        if (speed_state == SpeedStates.speedUp) {
+            drone.speedUp(deltaTime);
+            speed_state = SpeedStates.remain;
+        }
+        else if(speed_state == SpeedStates.speedDown) {
+            drone.slowDown(deltaTime);
+            speed_state = SpeedStates.remain;
+        }
+    }
+    // =========================== Override Functions =============================== //
+    @Override
+    public String getAlgoName() {
+        return "ZviAndGal Algorithm";
+    }
+
+    @Override
+    public void speedUp() {
+        speed_state = SpeedStates.speedUp;
+    }
+
+    @Override
+    public void speedDown() {
+        speed_state = SpeedStates.speedDown;
+    }
 
     @Override
     public Drone getDrone() {
         return drone;
     }
 
+    @Override
+    public void play() {
+        drone.play();
+        ai_cpu.play();
+    }
+
 }
+
+

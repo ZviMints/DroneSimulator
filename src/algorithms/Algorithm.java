@@ -135,6 +135,10 @@ public class Algorithm implements BaseAlgo {
 			map[xi][yi] = state; 
 		}
 	}
+	@Override
+	public String getAlgoName() {
+		return "Algorithm";
+	}
 	/*
 	
 	public void fineEdges(int x,int y) {

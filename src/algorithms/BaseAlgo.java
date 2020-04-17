@@ -7,6 +7,8 @@ import simulator.Graph;
 import java.awt.*;
 
 public interface BaseAlgo {
+    enum mapState {blocked, explored, unexplored, visited}
+    String getAlgoName();
     boolean is_risky = false;
     double risky_dis = 0;
     Graph graph = new Graph();
