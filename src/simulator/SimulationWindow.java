@@ -1,6 +1,7 @@
 package simulator;
 
-import algorithms.Algorithm;
+import algorithms.BaseAlgo;
+import algorithms.ZviAndGalAlgorithm;
 import configurations.Config;
 import cpu.CPU;
 import map.Map;
@@ -16,14 +17,12 @@ public class SimulationWindow {
     private JFrame frame;
 
     public static void main(String[] args) {
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    SimulationWindow window = new SimulationWindow();
-                    window.frame.setVisible(true);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+        EventQueue.invokeLater(() -> {
+            try {
+                SimulationWindow window = new SimulationWindow();
+                window.frame.setVisible(true);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         });
     }
@@ -44,11 +43,12 @@ public class SimulationWindow {
         frame.getContentPane().setLayout(null);
 
         /*
-         * Stop\Resume
+         * Stop \ Resume
          */
 
         JButton stopBtn = new JButton("Start/Pause");
         stopBtn.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent e) {
                 if (toogleStop) {
                     CPU.stopAllCPUS();
@@ -65,20 +65,12 @@ public class SimulationWindow {
          */
 
         JButton speedBtn1 = new JButton("speedUp");
-        speedBtn1.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                algo1.speedUp();
-            }
-        });
+        speedBtn1.addActionListener(e -> algorithm.speedUp());
         speedBtn1.setBounds(1300, 100, 100, 50);
         frame.getContentPane().add(speedBtn1);
 
         JButton speedBtn2 = new JButton("speedDown");
-        speedBtn2.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                algo1.speedDown();
-            }
-        });
+        speedBtn2.addActionListener(e -> algorithm.speedDown());
         speedBtn2.setBounds(1400, 100, 100, 50);
         frame.getContentPane().add(speedBtn2);
 
@@ -87,18 +79,14 @@ public class SimulationWindow {
          */
 
         JButton spinBtn1 = new JButton("spin180");
-        spinBtn1.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                algo1.spinBy(180);
-            }
-        });
+        spinBtn1.addActionListener(e -> algorithm.spinBy(180));
         spinBtn1.setBounds(1300, 200, 100, 50);
         frame.getContentPane().add(spinBtn1);
 
         JButton spinBtn2 = new JButton("spin90");
         spinBtn2.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                algo1.spinBy(90);
+                algorithm.spinBy(90);
             }
         });
         spinBtn2.setBounds(1400, 200, 100, 50);
@@ -107,7 +95,7 @@ public class SimulationWindow {
         JButton spinBtn3 = new JButton("spin60");
         spinBtn3.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                algo1.spinBy(60);
+                algorithm.spinBy(60);
             }
         });
         spinBtn3.setBounds(1500, 200, 100, 50);
@@ -116,7 +104,7 @@ public class SimulationWindow {
         JButton spinBtn4 = new JButton("spin45");
         spinBtn4.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                algo1.spinBy(60);
+                algorithm.spinBy(60);
             }
         });
         spinBtn4.setBounds(1300, 300, 100, 50);
@@ -125,7 +113,7 @@ public class SimulationWindow {
         JButton spinBtn5 = new JButton("spin30");
         spinBtn5.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                algo1.spinBy(30);
+                algorithm.spinBy(30);
             }
         });
         spinBtn5.setBounds(1400, 300, 100, 50);
@@ -134,7 +122,7 @@ public class SimulationWindow {
         JButton spinBtn6 = new JButton("spin-30");
         spinBtn6.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                algo1.spinBy(-30);
+                algorithm.spinBy(-30);
             }
         });
         spinBtn6.setBounds(1500, 300, 100, 50);
@@ -143,7 +131,7 @@ public class SimulationWindow {
         JButton spinBtn7 = new JButton("spin-45");
         spinBtn7.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                algo1.spinBy(-45);
+                algorithm.spinBy(-45);
             }
         });
         spinBtn7.setBounds(1600, 300, 100, 50);
@@ -152,7 +140,7 @@ public class SimulationWindow {
         JButton spinBtn8 = new JButton("spin-60");
         spinBtn8.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                algo1.spinBy(-60);
+                algorithm.spinBy(-60);
             }
         });
         spinBtn8.setBounds(1700, 300, 100, 50);
@@ -192,11 +180,11 @@ public class SimulationWindow {
         returnBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 return_home = !return_home;
-                algo1.speedDown();
-                algo1.spinBy(180, true, new Func() {
+                algorithm.speedDown();
+                algorithm.spinBy(180, true, new Func() {
                     @Override
                     public void method() {
-                        algo1.speedUp();
+                        algorithm.speedUp();
                     }
                 });
             }
@@ -207,7 +195,7 @@ public class SimulationWindow {
         JButton Graph = new JButton("Open simulator.Graph");
         Graph.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                algo1.mGraph.drawGraph();
+                algorithm.graph.drawGraph();
             }
         });
         Graph.setBounds(1600, 400, 120, 50);
@@ -236,7 +224,7 @@ public class SimulationWindow {
     public static boolean toogleRealMap = true;
     public static boolean toogleAI = false;
 
-    public static Algorithm algo1;
+    public static BaseAlgo algorithm;
 
     public void main() {
         int map_num = 4;
@@ -245,9 +233,9 @@ public class SimulationWindow {
 
         Map map = new Map(Config.root + "p1" + map_num + ".png", startPoints[map_num - 1]);
 
-        algo1 = new Algorithm(map);
+        algorithm = new ZviAndGalAlgorithm(map);
 
-        Painter painter = new Painter(algo1);
+        Painter painter = new Painter(algorithm);
         painter.setBounds(0, 0, 2000, 2000);
         frame.getContentPane().add(painter);
 
@@ -255,10 +243,10 @@ public class SimulationWindow {
         painterCPU.addFunction(frame::repaint);
         painterCPU.play();
 
-        algo1.play();
+        algorithm.play();
 
         CPU updatesCPU = new CPU(60, "updates");
-        updatesCPU.addFunction(algo1.drone::update);
+        updatesCPU.addFunction(algorithm.getDrone()::update);
         updatesCPU.play();
 
         CPU infoCPU = new CPU(6, "update_info");
@@ -267,16 +255,18 @@ public class SimulationWindow {
     }
 
     public void updateInfo(int deltaTime) {
-        info_label.setText(algo1.drone.getInfoHTML());
-        info_label2.setText("<html>" + String.valueOf(algo1.counter) + " <BR>isRisky:" + String.valueOf(algo1.is_risky)
-                + "<BR>" + String.valueOf(algo1.risky_dis) + "</html>");
+        info_label.setText(algorithm.getDrone().getInfoHTML());
+        info_label2.setText(
+                "<html>" +
+                        "isRisky: " + algorithm.is_risky + "<br>"
+                        + "riskyDistance: " + algorithm.risky_dis
+                        + "</html>");
 
     }
 
     public void stopCPUS() {
         CPU.stopAllCPUS();
     }
-
     public void resumseCPUS() {
         CPU.stopAllCPUS();
     }

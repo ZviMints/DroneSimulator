@@ -21,42 +21,35 @@ public class Drone {
     private Point sensorOpticalFlow;
 
     private Point pointFromStart;
-    public Point startPoint;
+    public Point startPoint; // Where the drone first time located
     public List<Lidar> lidars;
     private String drone_img_path = Config.root + "drone_3_pixels.png";
-    public Map realMap;
+    public Map map;
     private double rotation;
     private double speed;
     private CPU cpu;
 
-    public Drone(Map realMap) {
-        this.realMap = realMap;
-
-        this.startPoint = realMap.drone_start_point;
+    public Drone(Map map) {
+        this.map = map;
+        this.startPoint = map.drone_start_point;
         pointFromStart = new Point();
         sensorOpticalFlow = new Point();
         lidars = new ArrayList<>();
-
-        speed = 0.2;
-
+        speed = WorldParams.current_speed;
         rotation = 0;
         gyroRotation = rotation;
-
         cpu = new CPU(100, "drone");
     }
 
     public void play() {
         cpu.play();
     }
-
-    public void stop() {
-        cpu.stop();
-    }
+    public void stop() { cpu.stop(); }
 
     public void addLidar(int degrees) {
         Lidar lidar = new Lidar(this, degrees);
         lidars.add(lidar);
-        cpu.addFunction(lidar::getSimulationDistance);
+        cpu.addFunction(i -> lidar.getSimulationDistance());
     }
 
     public Point getPointOnMap() {
@@ -111,18 +104,9 @@ public class Drone {
         gyroRotation = formatRotation(gyroRotation);
     }
 
-    public void rotateRight(int deltaTime) {
-        double rotationChanged = -WorldParams.rotation_per_second * deltaTime / 1000;
-
-        rotation += rotationChanged;
-        rotation = formatRotation(rotation);
-
-        gyroRotation += rotationChanged;
-        gyroRotation = formatRotation(gyroRotation);
-    }
-
     public void speedUp(int deltaTime) {
         speed += (WorldParams.accelerate_per_second * deltaTime / 1000);
+        System.out.println("[speedUp] speed is not equal to: " + speed);
         if (speed > WorldParams.max_speed) {
             speed = WorldParams.max_speed;
         }
@@ -130,6 +114,7 @@ public class Drone {
 
     public void slowDown(int deltaTime) {
         speed -= (WorldParams.accelerate_per_second * deltaTime / 1000);
+        System.out.println("[slowDown] speed is not equal to: " + speed);
         if (speed < 0) {
             speed = 0;
         }

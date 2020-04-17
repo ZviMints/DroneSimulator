@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import cpu.CPU;
 import drone.Drone;
 import simulator.Func;
-import simulator.Graph;
 import simulator.Lidar;
 import map.Map;
 import map.Tools;
@@ -14,8 +13,8 @@ import configurations.WorldParams;
 import models.Point;
 import simulator.SimulationWindow;
 
-public class Algorithm {
-	
+public class Algorithm implements BaseAlgo {
+
 	int map_size = 3000;
 	enum PixelState { blocked,explored,unexplored,visited };
 	public PixelState map[][];
@@ -29,15 +28,13 @@ public class Algorithm {
 	ArrayList<Double> degrees_left;
 	ArrayList<Func> degrees_left_func;
 	
-	boolean isSpeedUp = false;
-	
-	public Graph mGraph = new Graph();
-	
+	public boolean isSpeedUp = false;
+
 	CPU ai_cpu;
 	public Algorithm(Map realMap) {
 		degrees_left = new ArrayList<>();
 		degrees_left_func =  new ArrayList<>();
-		points = new ArrayList<Point>();
+		points = new ArrayList<>();
 		
 		drone = new Drone(realMap);
 		drone.addLidar(0);
@@ -62,8 +59,10 @@ public class Algorithm {
 		
 		droneStartingPoint = new Point(map_size/2,map_size/2);
 	}
-	
-	public void play() {
+
+	@Override
+	public void play()
+	 {
 		drone.play();
 		ai_cpu.play();
 	}
@@ -111,7 +110,6 @@ public class Algorithm {
 			if(lidar.current_distance > 0 && lidar.current_distance < WorldParams.lidarLimit - WorldParams.lidarNoise) {
 				Point p = Tools.getPointByDistance(fromPoint, rotation, lidar.current_distance);
 				setPixel(p.x,p.y,PixelState.blocked);
-				//fineEdges((int)p.x,(int)p.y);
 			}
 		}
 	}
@@ -218,7 +216,7 @@ public class Algorithm {
 	
 	public void paint(Graphics g) {
 		if(SimulationWindow.toogleRealMap) {
-			drone.realMap.paint(g);
+			drone.map.paint(g);
 		}
 		
 		paintBlindMap(g);
@@ -228,7 +226,12 @@ public class Algorithm {
 		
 		
 	}
-	
+
+	@Override
+	public Drone getDrone() {
+		return drone;
+	}
+
 	boolean is_init = true;
 	double lastFrontLidarDis = 0;
 	boolean isRotateRight = false;
@@ -269,7 +272,7 @@ public class Algorithm {
 			Point dronePoint = drone.getOpticalSensorLocation();
 			init_point = new Point(dronePoint);
 			points.add(dronePoint);
-			mGraph.addVertex(dronePoint);
+			graph.addVertex(dronePoint);
 			is_init = false;
 		}
 		
@@ -293,7 +296,7 @@ public class Algorithm {
 		} else {
 			if( Tools.getDistanceBetweenPoints(getLastPoint(), dronePoint) >=  max_distance_between_points) {
 				points.add(dronePoint);
-				mGraph.addVertex(dronePoint);
+				graph.addVertex(dronePoint);
 			}
 		}
 	
@@ -348,7 +351,7 @@ public class Algorithm {
 					} else {
 						if( Tools.getDistanceBetweenPoints(getLastPoint(), dronePoint) >=  max_distance_between_points) {
 							points.add(dronePoint);
-							mGraph.addVertex(dronePoint);
+							graph.addVertex(dronePoint);
 						}
 					}
 					
@@ -384,25 +387,7 @@ public class Algorithm {
 			
 		//}
 	}
-	
-	public int counter = 0;
-	
-	public void doLeftRight() {
-		if(is_finish) {
-			leftOrRight *= -1;
-			counter++;
-			is_finish = false;
-			
-			spinBy(max_rotation_to_direction*leftOrRight,false,new Func() {
-				@Override
-				public void method() {
-					is_finish = true;
-				}
-			});
-		}
-	}
-	
-	
+
 	double lastGyroRotation = 0;
 	public void updateRotating(int deltaTime) {
 		
@@ -492,7 +477,6 @@ public class Algorithm {
 	
 	public void spinBy(double degrees) {
 		lastGyroRotation = drone.getGyroRotation();
-		
 		degrees_left.add(degrees);
 		degrees_left_func.add(null);
 		isRotating = 1;

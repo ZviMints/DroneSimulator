@@ -1,6 +1,5 @@
 package map;
 
-import drone.Drone;
 import models.Point;
 
 import javax.imageio.ImageIO;
@@ -19,9 +18,7 @@ public class Map {
             this.drone_start_point = drone_start_point;
             BufferedImage img_map = ImageIO.read(new File(path));
             this.map = render_map_from_image_to_boolean(img_map);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        } catch (IOException e) { }
     }
 
     private boolean[][] render_map_from_image_to_boolean(BufferedImage map_img) {
@@ -34,32 +31,25 @@ public class Map {
                 int red = (clr & 0x00ff0000) >> 16;
                 int green = (clr & 0x0000ff00) >> 8;
                 int blue = clr & 0x000000ff;
-                if (red != 0 && green != 0 && blue != 0) { // think black
-                    map[x][y] = true;
-                }
+                if (red != 0 && green != 0 && blue != 0) map[x][y] = true; // Map
             }
         }
-
         return map;
     }
 
-    public boolean isCollide(int x, int y) {
-
-        return !map[x][y];
-    }
+    public boolean isNotMap(int x, int y) { return !map[x][y]; }
 
     public void paint(Graphics g) {
         Color c = g.getColor();
-        g.setColor(Color.GRAY);
+        g.setColor(Color.BLACK);
         for (int i = 0; i < map.length; i++) {
             for (int j = 0; j < map[0].length; j++) {
-                if (!map[i][j]) {
+                if (isNotMap(i,j)) {
                     g.drawLine(i, j, i, j);
                 }
             }
         }
-        g.setColor(c);
+        g.setColor(c); // Color with Black
     }
-
 }
 

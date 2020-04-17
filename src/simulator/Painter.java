@@ -5,13 +5,14 @@ import java.awt.*;
 import javax.swing.JComponent;
 
 import algorithms.Algorithm;
+import algorithms.BaseAlgo;
 
 
 public class Painter extends JComponent{
 
-	Algorithm algo;
+	BaseAlgo algo;
 	
-	public Painter(Algorithm algo) {
+	public Painter(BaseAlgo algo) {
 		this.algo = algo;
 	}
 	

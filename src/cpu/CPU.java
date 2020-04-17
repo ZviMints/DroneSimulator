@@ -57,7 +57,6 @@ public class CPU {
         }
     }
 
-
     public void addFunction(IntConsumer a) {
         functions_list.add(a);
     }
@@ -73,14 +72,6 @@ public class CPU {
         isPlayedBeforeStop = false;
     }
 
-    public long getElapsedMilli() {
-        return this.elapsedMilli;
-    }
-
-    public void resetClock() {
-        this.elapsedMilli = 0;
-    }
-
     public void thread_run() {
         int functions_size = 0;
         int[] last_sample_times = null;
@@ -89,7 +80,7 @@ public class CPU {
 
         int time_to_sleep = 2;
         if (1000 / hz > 1) {
-            time_to_sleep = 1000 / hz;
+            time_to_sleep = 1000 / hz; // If hz bigger, then the thread will sleep for less time
         }
 
         while (true) {
