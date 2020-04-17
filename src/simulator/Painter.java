@@ -8,6 +8,7 @@ import algorithms.Algorithm;
 
 
 public class Painter extends JComponent{
+
 	Algorithm algo;
 	
 	public Painter(Algorithm algo) {
