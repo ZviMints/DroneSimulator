@@ -11,7 +11,7 @@ public class WorldParams {
 	public static int min_rotation_accuracy = 0; // 2
 	public static int max_rotation_accuracy = 1; // 5
 
-	public static double current_speed = 0.2;
-	public static double max_speed = 0.5; // 1 meter per second - This is the maximum speed of the drone
+	public static double start_speed = 0.5;
+	public static double max_speed = 1.5; // 1 meter per second - This is the maximum speed of the drone
 
 }

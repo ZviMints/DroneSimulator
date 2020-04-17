@@ -35,7 +35,7 @@ public class Drone {
         pointFromStart = new Point();
         sensorOpticalFlow = new Point();
         lidars = new ArrayList<>();
-        speed = WorldParams.current_speed;
+        speed = WorldParams.start_speed;
         rotation = 0;
         gyroRotation = rotation;
         cpu = new CPU(100, "drone");
@@ -106,18 +106,18 @@ public class Drone {
 
     public void speedUp(int deltaTime) {
         speed += (WorldParams.accelerate_per_second * deltaTime / 1000);
-        System.out.println("[speedUp] speed is not equal to: " + speed);
         if (speed > WorldParams.max_speed) {
             speed = WorldParams.max_speed;
         }
+        System.out.println("[speedUp] speed is now equal to: " + speed);
     }
 
     public void slowDown(int deltaTime) {
         speed -= (WorldParams.accelerate_per_second * deltaTime / 1000);
-        System.out.println("[slowDown] speed is not equal to: " + speed);
         if (speed < 0) {
             speed = 0;
         }
+        System.out.println("[slowDown] speed is now equal to: " + speed);
     }
 
 
