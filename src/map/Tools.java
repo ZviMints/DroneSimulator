@@ -1,4 +1,9 @@
+package map;
+
 import java.util.Random;
+
+import configurations.WorldParams;
+import models.Point;
 
 public class Tools {
 
@@ -8,7 +13,7 @@ public class Tools {
 	public static Point getPointByDistance(Point fromPoint, double rotation, double distance) {
 		double radians = Math.PI*(rotation/180);
 		
-		double i= distance/WorldParams.CMPerPixel;
+		double i= distance / WorldParams.CMPerPixel;
 		double xi = fromPoint.x + Math.cos(radians)*i;
 		double yi = fromPoint.y + Math.sin(radians)*i;
 		

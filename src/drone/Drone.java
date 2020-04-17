@@ -1,7 +1,15 @@
-import javax.imageio.ImageIO;
+package drone;
 
-import java.awt.Graphics;
-import java.awt.Window;
+import configurations.Config;
+import configurations.WorldParams;
+import cpu.CPU;
+import map.Map;
+import map.Tools;
+import models.Point;
+import simulator.Lidar;
+
+import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.text.DecimalFormat;
@@ -15,7 +23,7 @@ public class Drone {
 	private Point pointFromStart;
 	public Point startPoint;
 	public List<Lidar> lidars;
-	private String drone_img_path = "D:\\Tests\\drone_3_pixels.png";
+	private String drone_img_path = Config.root + "drone_3_pixels.png";
 	public Map realMap;
 	private double rotation;
 	private double speed;
@@ -34,7 +42,7 @@ public class Drone {
 		rotation = 0;
 		gyroRotation = rotation;
 		
-		cpu = new CPU(100,"Drone");
+		cpu = new CPU(100, "drone");
 	}
 	
 	public void play() {
@@ -64,10 +72,10 @@ public class Drone {
 		
 		pointFromStart =  Tools.getPointByDistance(pointFromStart, rotation, distancedMoved);
 		
-		double noiseToDistance = Tools.noiseBetween(WorldParams.min_motion_accuracy,WorldParams.max_motion_accuracy,false);
+		double noiseToDistance = Tools.noiseBetween(WorldParams.min_motion_accuracy, WorldParams.max_motion_accuracy,false);
 		sensorOpticalFlow = Tools.getPointByDistance(sensorOpticalFlow, rotation, distancedMoved*noiseToDistance);
 		
-		double noiseToRotation = Tools.noiseBetween(WorldParams.min_rotation_accuracy,WorldParams.max_rotation_accuracy,false);
+		double noiseToRotation = Tools.noiseBetween(WorldParams.min_rotation_accuracy, WorldParams.max_rotation_accuracy,false);
 		double milli_per_minute = 60000;
 		gyroRotation += (1-noiseToRotation)*deltaTime/milli_per_minute;
 		gyroRotation = formatRotation(gyroRotation);
@@ -117,7 +125,7 @@ public class Drone {
 	public void speedUp(int deltaTime) {
 		speed += (WorldParams.accelerate_per_second*deltaTime/1000);
 		if(speed > WorldParams.max_speed) {
-			speed =WorldParams.max_speed;
+			speed = WorldParams.max_speed;
 		}
 	}
 	

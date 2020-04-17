@@ -1,8 +1,15 @@
-import java.awt.EventQueue;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+package simulator;
+
+import algorithms.Algorithm;
+import configurations.Config;
+import cpu.CPU;
+import map.Map;
+import models.Point;
 
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class SimulationWindow {
 
@@ -32,7 +39,7 @@ public class SimulationWindow {
 	private void initialize() {
 		frame = new JFrame();
 		frame.setSize(1800, 700);
-		frame.setTitle("Drone Simulator");
+		frame.setTitle("Drone.Drone Simulator");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 
@@ -197,7 +204,7 @@ public class SimulationWindow {
 		returnBtn.setBounds(1500, 400, 120, 50);
 		frame.getContentPane().add(returnBtn);
 
-		JButton Graph = new JButton("Open Graph");
+		JButton Graph = new JButton("Open simulator.Graph");
 		Graph.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				algo1.mGraph.drawGraph();
@@ -229,16 +236,16 @@ public class SimulationWindow {
 	public static boolean toogleRealMap = true;
 	public static boolean toogleAI = false;
 
-	public static AutoAlgo1 algo1;
+	public static Algorithm algo1;
 
 	public void main() {
 		int map_num = 4;
 		Point[] startPoints = { new Point(100, 50), new Point(50, 60), new Point(73, 68), new Point(84, 73),
 				new Point(92, 100) };
 
-		Map map = new Map("./Maps/p1" + map_num + ".png", startPoints[map_num - 1]);
+		Map map = new Map(Config.root + "p1" + map_num + ".png", startPoints[map_num - 1]);
 
-		algo1 = new AutoAlgo1(map);
+		algo1 = new Algorithm(map);
 
 		Painter painter = new Painter(algo1);
 		painter.setBounds(0, 0, 2000, 2000);

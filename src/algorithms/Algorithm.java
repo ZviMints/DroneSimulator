@@ -1,14 +1,26 @@
+package algorithms;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.util.ArrayList;
 
-public class AutoAlgo1 {
+import cpu.CPU;
+import drone.Drone;
+import simulator.Func;
+import simulator.Graph;
+import simulator.Lidar;
+import map.Map;
+import map.Tools;
+import configurations.WorldParams;
+import models.Point;
+import simulator.SimulationWindow;
+
+public class Algorithm {
 	
 	int map_size = 3000;
-	enum PixelState {blocked,explored,unexplored,visited};
-	PixelState map[][];
-	Drone drone;
-	Point droneStartingPoint;
+	enum PixelState { blocked,explored,unexplored,visited };
+	public PixelState map[][];
+	public Drone drone;
+	public Point droneStartingPoint;
 	
 	ArrayList<Point> points;
 	
@@ -19,10 +31,10 @@ public class AutoAlgo1 {
 	
 	boolean isSpeedUp = false;
 	
-	Graph mGraph = new Graph();
+	public Graph mGraph = new Graph();
 	
 	CPU ai_cpu;
-	public AutoAlgo1(Map realMap) {
+	public Algorithm(Map realMap) {
 		degrees_left = new ArrayList<>();
 		degrees_left_func =  new ArrayList<>();
 		points = new ArrayList<Point>();
@@ -90,7 +102,7 @@ public class AutoAlgo1 {
 		for(int i=0;i<drone.lidars.size();i++) {
 			Lidar lidar = drone.lidars.get(i);
 			double rotation = drone.getGyroRotation() + lidar.degrees;
-			//rotation = Drone.formatRotation(rotation);
+			//rotation = Drone.Drone.formatRotation(rotation);
 			for(int distanceInCM=0;distanceInCM < lidar.current_distance;distanceInCM++) {
 				Point p = Tools.getPointByDistance(fromPoint, rotation, distanceInCM);
 				setPixel(p.x,p.y,PixelState.explored);
@@ -231,11 +243,11 @@ public class AutoAlgo1 {
 	boolean isLeftRightRotationEnable = true;
 	
 	
-	boolean is_risky = false;
-	int max_risky_distance = 150;
-	boolean try_to_escape = false;
-	double  risky_dis = 0;
-	int max_angle_risky = 10;
+	public boolean is_risky = false;
+	public int max_risky_distance = 150;
+	public boolean try_to_escape = false;
+	public double  risky_dis = 0;
+	public int max_angle_risky = 10;
 	
 	boolean is_lidars_max = false;
 	
@@ -373,7 +385,7 @@ public class AutoAlgo1 {
 		//}
 	}
 	
-	int counter = 0;
+	public int counter = 0;
 	
 	public void doLeftRight() {
 		if(is_finish) {

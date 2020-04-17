@@ -1,12 +1,19 @@
+package simulator;
+
 import java.awt.Graphics;
 import java.util.Random;
 
+import drone.Drone;
+import configurations.WorldParams;
+import map.Tools;
+import models.Point;
+
 public class Lidar{
-	Drone drone;
-	double degrees;
-	double current_distance = 0;
+	public Drone drone;
+	public double degrees;
+	public double current_distance = 0;
 	
-	public Lidar(Drone drone,double degrees) {
+	public Lidar(Drone drone, double degrees) {
 		this.drone = drone;
 		this.degrees = degrees;
 	}
@@ -16,7 +23,7 @@ public class Lidar{
 		double rotation = drone.getRotation()+degrees;
 		
 		double distanceInCM=1;
-		while(distanceInCM <= WorldParams.lidarLimit) { 
+		while(distanceInCM <= WorldParams.lidarLimit) {
 			Point p = Tools.getPointByDistance(actualPointToShoot, rotation, distanceInCM);
 			if(drone.realMap.isCollide((int)p.x,(int)p.y)) {
 				break;

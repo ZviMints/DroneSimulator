@@ -1,3 +1,5 @@
+package simulator;
+
 import java.util.Iterator;
 import java.util.Set;
 
@@ -13,6 +15,8 @@ import org.jgrapht.graph.DefaultEdge;
 import com.mxgraph.layout.mxCircleLayout;
 import com.mxgraph.layout.mxIGraphLayout;
 import com.mxgraph.swing.mxGraphComponent;
+
+import models.Point;
 
 public class Graph {
 
@@ -60,7 +64,7 @@ public class Graph {
     public void drawGraph() {
     	JFrame new_window = new JFrame();
     	new_window.setSize(500,500);
-    	new_window.setTitle("Graph Viewer");
+    	new_window.setTitle("simulator.Graph Viewer");
     	JGraphXAdapter<Point, DefaultEdge> graphAdapter = new JGraphXAdapter<Point, DefaultEdge>(g);
 
         mxIGraphLayout layout = new mxCircleLayout(graphAdapter);

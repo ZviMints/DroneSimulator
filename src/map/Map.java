@@ -1,16 +1,19 @@
+package map;
+
+import drone.Drone;
+import models.Point;
+
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Window;
-import java.awt.image.BufferedImage;
-import javax.imageio.ImageIO;
 
 
 public class Map{
 	private boolean[][] map;
-	Drone drone;
-	Point drone_start_point;
+	public Drone drone;
+	public Point drone_start_point;
 
 	public Map(String path,Point drone_start_point) {
 		try {
@@ -41,7 +44,7 @@ public class Map{
 		return map;
 	}
 	
-	boolean isCollide(int x,int y) {
+	public boolean isCollide(int x, int y) {
 		
 		return !map[x][y];
 	}

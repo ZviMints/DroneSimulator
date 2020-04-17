@@ -1,3 +1,4 @@
+package configurations;
 
 public class WorldParams {
 	public static int lidarLimit = 300; // in cm

@@ -1,12 +1,16 @@
+package simulator;
+
 import java.awt.*;
 
 import javax.swing.JComponent;
 
+import algorithms.Algorithm;
+
 
 public class Painter extends JComponent{
-	AutoAlgo1 algo;
+	Algorithm algo;
 	
-	public Painter(AutoAlgo1 algo) {
+	public Painter(Algorithm algo) {
 		this.algo = algo;
 	}
 	
