@@ -10,7 +10,7 @@ import java.io.IOException;
 
 
 public class Map {
-    private boolean[][] map;
+    public boolean[][] map;
     public Point drone_start_point;
 
     public Map(String path, Point drone_start_point) {
@@ -49,7 +49,7 @@ public class Map {
                 }
             }
         }
-        g.setColor(c); // Color with Black
+        g.setColor(c);
     }
 }
 

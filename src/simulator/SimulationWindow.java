@@ -252,6 +252,9 @@ public class SimulationWindow {
         info_label2.setText(
                 "<html>" +
                         "Speed: " + algorithm.getSpeed() + "<br>"
+                        + "distRight: " + algorithm.getDistRight() + "<br>"
+                        + "distLeft: " + algorithm.getDistLeft() + "<br>"
+                        + "distForward: " + algorithm.getDistForward() + "<br>"
                         + "isRisky: " + algorithm.getRiskyState() + "<br>"
                         + "riskyDistance: " + algorithm.getRiskyDist()
                         + "</html>");

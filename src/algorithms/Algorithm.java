@@ -243,7 +243,19 @@ public class Algorithm implements BaseAlgo {
 	double changedLeft = 0;
 	boolean tryToEscape = false;
 	int leftOrRight = 1;
-	
+
+	@Override
+	public double getDistRight(){
+		return drone.lidars.get(1).current_distance;
+	}
+	@Override
+	public double getDistLeft(){
+		return drone.lidars.get(2).current_distance;
+	}
+	@Override
+	public double getDistForward(){
+		return drone.lidars.get(0).current_distance;
+	}
 
 	double max_rotation_to_direction = 20;
 	boolean  is_finish = true;

@@ -9,6 +9,9 @@ import java.awt.*;
 public interface BaseAlgo {
     enum mapState {blocked, explored, unexplored, visited}
     String getAlgoName();
+    double getDistRight();
+    double getDistLeft();
+    double getDistForward();
     boolean getRiskyState();
     double getRiskyDist();
     double getSpeed();
