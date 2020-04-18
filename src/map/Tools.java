@@ -43,8 +43,7 @@ public class Tools {
 		double y1 = from.y - to.y;
 		double x1 = from.x - to.x;
 		
-		
-		
+
 		double radians = Math.atan(y1/ x1);
 		
 		double rotation = radians * 180 / Math.PI; 

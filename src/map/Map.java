@@ -41,7 +41,7 @@ public class Map {
 
     public void paint(Graphics g) {
         Color c = g.getColor();
-        g.setColor(Color.BLACK);
+        g.setColor(Color.LIGHT_GRAY);
         for (int i = 0; i < map.length; i++) {
             for (int j = 0; j < map[0].length; j++) {
                 if (isNotMap(i,j)) {

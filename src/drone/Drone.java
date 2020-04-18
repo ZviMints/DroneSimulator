@@ -25,7 +25,7 @@ public class Drone {
     public List<Lidar> lidars;
     private String drone_img_path = Config.root + "drone_3_pixels.png";
     public Map map;
-    private double rotation;
+    public double rotation;
     public double speed;
     private CPU cpu;
 
@@ -114,8 +114,8 @@ public class Drone {
 
     public void slowDown(int deltaTime) {
         speed -= (WorldParams.accelerate_per_second * deltaTime / 1000);
-        if (speed < 0) {
-            speed = 0;
+        if (speed < WorldParams.min_speed) {
+            speed = WorldParams.min_speed;
         }
         System.out.println("[slowDown] speed is now equal to: " + speed);
     }
