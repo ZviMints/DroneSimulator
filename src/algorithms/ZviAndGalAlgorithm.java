@@ -24,7 +24,7 @@ public class ZviAndGalAlgorithm implements BaseAlgo {
 
     int map_size = 3000;
 
-    int lock_time = 10;
+    int lock_time = 5;
     Date lock = DateUtils.addSeconds(new Date(), lock_time);
 
     public mapState statesMap[][];
@@ -32,6 +32,7 @@ public class ZviAndGalAlgorithm implements BaseAlgo {
     public Point droneStartingPoint;
 
     ArrayList<Point> points;
+    ArrayList<Point> smart_points;
     public Date startDate;
 
     int isRotating;
@@ -50,7 +51,7 @@ public class ZviAndGalAlgorithm implements BaseAlgo {
     public int max_angle_risky = 10;
 
     boolean is_lidars_max = false;
-    double max_distance_between_points = 1000;
+    double max_distance_between_points = 300;
     Point currentPoint;
     double lastGyroRotation = 0;
 
@@ -63,6 +64,7 @@ public class ZviAndGalAlgorithm implements BaseAlgo {
         degrees_left = new ArrayList<>();
         degrees_left_func = new ArrayList<>();
         points = new ArrayList<>();
+        smart_points = new ArrayList<>();
 
         // Adding Drone And Lidars
         drone = new Drone(realMap);
@@ -120,6 +122,14 @@ public class ZviAndGalAlgorithm implements BaseAlgo {
     public void paintPoints(Graphics g) {
         for (int i = 0; i < points.size(); i++) {
             Point p = points.get(i);
+            g.drawOval((int) p.x + (int) drone.startPoint.x - 10, (int) p.y + (int) drone.startPoint.y - 10, 20, 20);
+        }
+    }
+
+    public void paintSmartPoints(Graphics g) {
+        for (int i = 0; i < smart_points.size(); i++) {
+            Point p = smart_points.get(i);
+            g.setColor(Color.green);
             g.drawOval((int) p.x + (int) drone.startPoint.x - 10, (int) p.y + (int) drone.startPoint.y - 10, 20, 20);
         }
     }
@@ -274,6 +284,7 @@ public class ZviAndGalAlgorithm implements BaseAlgo {
         if (SimulationWindow.toogleRealMap) drone.map.paint(g);
         paintBlindMap(g);
         paintPoints(g);
+        paintSmartPoints(g);
         Blink(g);
         drone.paint(g);
     }
@@ -377,12 +388,18 @@ public class ZviAndGalAlgorithm implements BaseAlgo {
 
             Point dronePoint = drone.getOpticalSensorLocation();
 
+            // Exercise 4
+            if(relevantPoint() && new Date().after(lock)) {
+                smart_points.add(dronePoint);
+                graph.addVertex(dronePoint);
+                lock = DateUtils.addSeconds(lock, lock_time); // add seconds
+
+
+            }
             if (!(SimulationWindow.return_home)) {
-                if (Tools.getDistanceBetweenPoints(getLastPoint(), dronePoint) >= max_distance_between_points
-                    || relevantPoint() && new Date().after(lock)) {
+                if (Tools.getDistanceBetweenPoints(getLastPoint(), dronePoint) >= max_distance_between_points ){
                     points.add(dronePoint);
                     graph.addVertex(dronePoint);
-                    lock = DateUtils.addSeconds(lock, lock_time); // add seconds
                 }
             } else { // SimulationWindow.return_home
                 if (points.isEmpty()) {
@@ -530,6 +547,7 @@ public class ZviAndGalAlgorithm implements BaseAlgo {
         return p;
     }
 
+    // Exercise 3
     @Override
     public double getBattery() {
         Date diff = new Date(new Date().getTime() - this.startDate.getTime());
