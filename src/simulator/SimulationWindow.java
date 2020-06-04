@@ -46,6 +46,22 @@ public class SimulationWindow {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().setLayout(null);
 
+
+        /*
+        * Draw Edges
+         */
+
+
+        JButton drawEdges = new JButton("Draw Edges");
+        drawEdges.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                // Gal do epic shit here
+            }
+        });
+        drawEdges.setBounds(140, 610, 120, 50);
+        frame.getContentPane().add(drawEdges);
+
+
         /*
          * RETURN TO HOME
          */
