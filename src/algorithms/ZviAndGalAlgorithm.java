@@ -131,6 +131,9 @@ public class ZviAndGalAlgorithm implements BaseAlgo {
             Point p = smart_points.get(i);
             g.setColor(Color.green);
             g.drawOval((int) p.x + (int) drone.startPoint.x - 10, (int) p.y + (int) drone.startPoint.y - 10, 20, 20);
+            if(i == smart_points.size() - 1)
+            g.drawString("Last",(int) p.x + (int) drone.startPoint.x - 10, (int) p.y + (int) drone.startPoint.y - 10);
+
         }
     }
 
@@ -433,8 +436,8 @@ public class ZviAndGalAlgorithm implements BaseAlgo {
 
             // Remove Last Point
             if (SimulationWindow.return_home) {
-                if (!points.isEmpty())
-                    if (Tools.getDistanceBetweenPoints(dronePoint, points.get(points.size() - 1)) <= 35)
+                if (!smart_points.isEmpty())
+                    if (Tools.getDistanceBetweenPoints(dronePoint, smart_points.get(smart_points.size() - 1)) <= 35)
                         removeLastPoint();
             }
 
@@ -442,8 +445,8 @@ public class ZviAndGalAlgorithm implements BaseAlgo {
             if (!risky) {
                 // Return Home
                 if (SimulationWindow.return_home) {
-                    if (!points.isEmpty()) {
-                        double rotation = Tools.getRotationBetweenPoints(dronePoint, points.get(points.size() - 1));
+                    if (!smart_points.isEmpty()) {
+                        double rotation = Tools.getRotationBetweenPoints(dronePoint, smart_points.get(smart_points.size() - 1));
                         spinBy(rotation);
                     }
                 } else if (dist_forward > dist_right && dist_forward > dist_left)
@@ -463,7 +466,7 @@ public class ZviAndGalAlgorithm implements BaseAlgo {
                         double dis_to_lidar2 = Tools.getDistanceBetweenPoints(last_point, l2);
 
                         if (SimulationWindow.return_home) {
-                            if (Tools.getDistanceBetweenPoints(dronePoint, points.get(points.size() - 1)) <= 35) {
+                            if (Tools.getDistanceBetweenPoints(dronePoint, smart_points.get(smart_points.size() - 1)) <= 35) {
                                 removeLastPoint();
                             }
                         } else {
@@ -497,8 +500,8 @@ public class ZviAndGalAlgorithm implements BaseAlgo {
                             }
                         }
                         if (SimulationWindow.return_home) {
-                            if(!points.isEmpty()) {
-                                double rotation = Tools.getRotationBetweenPoints(dronePoint, points.get(points.size() - 1));
+                            if(!smart_points.isEmpty()) {
+                                double rotation = Tools.getRotationBetweenPoints(dronePoint, smart_points.get(smart_points.size() - 1));
                                 if (!(rotation >= -90 && rotation <= 90))
                                     spin_by += -1;
                             }
@@ -537,8 +540,8 @@ public class ZviAndGalAlgorithm implements BaseAlgo {
     }
 
     public Point removeLastPoint() {
-        if (points.isEmpty()) return currentPoint;
-        else return points.remove(points.size() - 1);
+        if (smart_points.isEmpty()) return currentPoint;
+        else return smart_points.remove(smart_points.size() - 1);
     }
 
     public Point getLastPoint() {

@@ -36,6 +36,7 @@ public class SimulationWindow {
 
     public static JLabel info_label;
     public static boolean return_home = false;
+    public static boolean speed_logs = false;
     boolean toogleStop = true;
 
 
@@ -46,9 +47,21 @@ public class SimulationWindow {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().setLayout(null);
 
+        /*
+         * Speed Logs
+         */
+
+        JButton speedLogsBtn = new JButton("Toggle Speed Logs");
+        speedLogsBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                speed_logs = !speed_logs;
+            }
+        });
+        speedLogsBtn.setBounds(140 + 130, 610, 150, 50);
+        frame.getContentPane().add(speedLogsBtn);
 
         /*
-        * Draw Edges
+         * Draw Edges
          */
 
 

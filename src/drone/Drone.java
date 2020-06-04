@@ -7,6 +7,7 @@ import map.Map;
 import map.Tools;
 import models.Point;
 import simulator.Lidar;
+import simulator.SimulationWindow;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -109,7 +110,7 @@ public class Drone {
         if (speed > WorldParams.max_speed) {
             speed = WorldParams.max_speed;
         }
-        System.out.println("[speedUp] speed is now equal to: " + speed);
+        if(SimulationWindow.speed_logs) System.out.println("[speedUp] speed is now equal to: " + speed);
     }
 
     public void slowDown(int deltaTime) {
@@ -117,7 +118,7 @@ public class Drone {
         if (speed < WorldParams.min_speed) {
             speed = WorldParams.min_speed;
         }
-        System.out.println("[slowDown] speed is now equal to: " + speed);
+        if(SimulationWindow.speed_logs) System.out.println("[slowDown] speed is now equal to: " + speed);
     }
 
 
