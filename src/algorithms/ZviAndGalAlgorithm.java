@@ -125,7 +125,20 @@ public class ZviAndGalAlgorithm implements BaseAlgo {
             g.drawOval((int) p.x + (int) drone.startPoint.x - 10, (int) p.y + (int) drone.startPoint.y - 10, 20, 20);
         }
     }
-
+    public void DrawSmartLines(Graphics g) {
+        if(smart_points.size() == 0) return;
+        if(smart_points.size() == 1) return;
+        for (int i = 0; i < smart_points.size(); i+=1) {
+            Point firstP = smart_points.get(i);
+            Point nextP = null;
+            if(i + 1 < smart_points.size())
+                nextP = smart_points.get(i+1);
+            if(nextP != null) {
+                g.setColor(Color.cyan);
+                g.drawLine((int)firstP.x,(int)firstP.y,(int)nextP.x,(int)nextP.y);
+            }
+        }
+    }
     public void paintSmartPoints(Graphics g) {
         for (int i = 0; i < smart_points.size(); i++) {
             Point p = smart_points.get(i);
@@ -285,6 +298,7 @@ public class ZviAndGalAlgorithm implements BaseAlgo {
     @Override
     public void paint(Graphics g) {
         if (SimulationWindow.toogleRealMap) drone.map.paint(g);
+        if(SimulationWindow.draw_smart_lines) DrawSmartLines(g);
         paintBlindMap(g);
         paintPoints(g);
         paintSmartPoints(g);

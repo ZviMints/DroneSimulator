@@ -37,6 +37,7 @@ public class SimulationWindow {
     public static JLabel info_label;
     public static boolean return_home = false;
     public static boolean speed_logs = false;
+    public static boolean draw_smart_lines = false;
     boolean toogleStop = true;
 
 
@@ -68,7 +69,7 @@ public class SimulationWindow {
         JButton drawEdges = new JButton("Draw Edges");
         drawEdges.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                // Gal do epic shit here
+                draw_smart_lines = !draw_smart_lines;
             }
         });
         drawEdges.setBounds(140, 610, 120, 50);
@@ -94,7 +95,7 @@ public class SimulationWindow {
          */
 
         info_label = new JLabel();
-        info_label.setBounds(10, 475, 200, 150);
+        info_label.setBounds(10, 400, 200, 300);
         frame.getContentPane().add(info_label);
 
         /*
@@ -102,7 +103,7 @@ public class SimulationWindow {
          */
 
         info_label2 = new JLabel();
-        info_label2.setBounds(10, 370, 200, 150);
+        info_label2.setBounds(10, 325, 200, 200);
         frame.getContentPane().add(info_label2);
 
         main();
@@ -148,6 +149,8 @@ public class SimulationWindow {
                 "<html>" +
                         "<b>" + "Zvi Mints And Gal Hadida" + "</b><br>" +
                         "<p style=\"color:red\">" + "Battery: " + algorithm.getBattery() + " % </p>" +
+                        "<p style=\"color:cyan\">" + "SpeedLogs: " + speed_logs + " </p>" +
+                        "<p style=\"color:green\">" + "DrawLines: " + draw_smart_lines + " </p>" +
                         "Speed: " + algorithm.getSpeed() + "<br>"
                         + "distRight: " + algorithm.getDistRight() + "<br>"
                         + "distLeft: " + algorithm.getDistLeft() + "<br>"
