@@ -15,7 +15,7 @@ public interface BaseAlgo {
     boolean getRiskyState();
     double getRiskyDist();
     double getSpeed();
-    Graph graph = new Graph();
+    double getBattery();
     void play();
     void speedUp();
     void speedDown();
@@ -23,4 +23,6 @@ public interface BaseAlgo {
     void spinBy(double degrees);
     void paint(Graphics g);
     Drone getDrone();
+
+    Graph graph = new Graph();
 }

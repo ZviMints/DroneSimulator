@@ -2,6 +2,8 @@ package algorithms;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 import cpu.CPU;
 import drone.Drone;
@@ -20,6 +22,7 @@ public class Algorithm implements BaseAlgo {
 	public PixelState map[][];
 	public Drone drone;
 	public Point droneStartingPoint;
+	public Date startDate;
 	
 	ArrayList<Point> points;
 	
@@ -32,6 +35,7 @@ public class Algorithm implements BaseAlgo {
 
 	CPU ai_cpu;
 	public Algorithm(Map realMap) {
+		startDate = new Date();
 		degrees_left = new ArrayList<>();
 		degrees_left_func =  new ArrayList<>();
 		points = new ArrayList<>();
@@ -272,7 +276,7 @@ public class Algorithm implements BaseAlgo {
 	
 	double save_point_after_seconds = 3;
 	
-	double max_distance_between_points = 100;
+	double max_distance_between_points = 30;
 	
 	boolean start_return_home = false;
 	
@@ -288,7 +292,7 @@ public class Algorithm implements BaseAlgo {
 			Point dronePoint = drone.getOpticalSensorLocation();
 			init_point = new Point(dronePoint);
 			points.add(dronePoint);
-			graph.addVertex(dronePoint);
+				graph.addVertex(dronePoint);
 			is_init = false;
 		}
 		
@@ -537,6 +541,14 @@ public class Algorithm implements BaseAlgo {
 	@Override
 	public double getSpeed(){
 		return drone.speed;
+	}
+
+	@Override
+	public double getBattery() {
+		Date diff = new Date(new Date().getTime() - this.startDate.getTime());
+		Calendar calendar = Calendar.getInstance();
+		int minutes = calendar.get(Calendar.MINUTE);
+		return minutes;
 	}
 
 }

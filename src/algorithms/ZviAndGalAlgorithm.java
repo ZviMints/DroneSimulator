@@ -6,22 +6,33 @@ import drone.Drone;
 import map.Map;
 import map.Tools;
 import models.Point;
+import org.apache.commons.lang3.time.DateUtils;
 import simulator.Func;
 import simulator.Lidar;
 import simulator.SimulationWindow;
 
+import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.concurrent.locks.Lock;
+
+import static javax.swing.JOptionPane.showMessageDialog;
 
 public class ZviAndGalAlgorithm implements BaseAlgo {
 
     int map_size = 3000;
+
+    int lock_time = 10;
+    Date lock = DateUtils.addSeconds(new Date(), lock_time);
 
     public mapState statesMap[][];
     public Drone drone;
     public Point droneStartingPoint;
 
     ArrayList<Point> points;
+    public Date startDate;
 
     int isRotating;
     ArrayList<Double> degrees_left;
@@ -29,7 +40,7 @@ public class ZviAndGalAlgorithm implements BaseAlgo {
 
     CPU cpu;
     Map map;
-
+    JFrame frame;
     boolean justInitialized = true;
     public boolean risky = false;
     public int max_risky_distance = 150;
@@ -39,12 +50,14 @@ public class ZviAndGalAlgorithm implements BaseAlgo {
     public int max_angle_risky = 10;
 
     boolean is_lidars_max = false;
-    double max_distance_between_points = 50;
+    double max_distance_between_points = 1000;
     Point currentPoint;
     double lastGyroRotation = 0;
 
     // =========================== Constructor =========================== //
-    public ZviAndGalAlgorithm(Map realMap) {
+    public ZviAndGalAlgorithm(Map realMap, JFrame frame) {
+        this.frame = frame;
+        this.startDate = new Date();
         System.out.println("Initialize " + getAlgoName() + " Algorithm");
 
         degrees_left = new ArrayList<>();
@@ -112,6 +125,18 @@ public class ZviAndGalAlgorithm implements BaseAlgo {
     }
 
     public void update(int deltaTime) {
+
+        if(getBattery() < 0) {
+            //todo: seperate gui and logic, can be done later
+            frame.setVisible(false); //you can't see me!
+            frame.dispose(); //Destroy the JFrame object
+            cpu.stopAllCPUS();
+            showMessageDialog(null, "No Battery! Dammit");
+            return;
+        }
+
+        if(getBattery() == 50)  SimulationWindow.return_home = true;
+
         updateVisited();
         updateMapByLidars();
         Think();
@@ -329,7 +354,7 @@ public class ZviAndGalAlgorithm implements BaseAlgo {
         Lidar left = drone.lidars.get(2);
         double b = left.current_distance;
 
-        g.setColor(((a < 15 || b < 15 || dist_forward < 15) && a != 0.0 && b != 0.0 && dist_forward != 0.0) ? Color.RED : ((SimulationWindow.return_home) ? Color.GREEN : Color.LIGHT_GRAY));
+        g.setColor(((a < 8 || b < 8 || dist_forward < 10) && a != 0.0 && b != 0.0 && dist_forward != 0.0) ? Color.RED : ((SimulationWindow.return_home) ? Color.GREEN : Color.LIGHT_GRAY));
         for (int i = 0; i < map.map.length; i++) {
             for (int j = 0; j < map.map[0].length; j++) {
                 if (map.isNotMap(i, j)) {
@@ -353,9 +378,11 @@ public class ZviAndGalAlgorithm implements BaseAlgo {
             Point dronePoint = drone.getOpticalSensorLocation();
 
             if (!(SimulationWindow.return_home)) {
-                if (Tools.getDistanceBetweenPoints(getLastPoint(), dronePoint) >= max_distance_between_points) {
+                if (Tools.getDistanceBetweenPoints(getLastPoint(), dronePoint) >= max_distance_between_points
+                    || relevantPoint() && new Date().after(lock)) {
                     points.add(dronePoint);
                     graph.addVertex(dronePoint);
+                    lock = DateUtils.addSeconds(lock, lock_time); // add seconds
                 }
             } else { // SimulationWindow.return_home
                 if (points.isEmpty()) {
@@ -419,7 +446,7 @@ public class ZviAndGalAlgorithm implements BaseAlgo {
                         double dis_to_lidar2 = Tools.getDistanceBetweenPoints(last_point, l2);
 
                         if (SimulationWindow.return_home) {
-                            if (Tools.getDistanceBetweenPoints(getLastPoint(), dronePoint) < max_distance_between_points) {
+                            if (Tools.getDistanceBetweenPoints(dronePoint, points.get(points.size() - 1)) <= 35) {
                                 removeLastPoint();
                             }
                         } else {
@@ -445,7 +472,7 @@ public class ZviAndGalAlgorithm implements BaseAlgo {
                             // Looking for dist_right new place to go
                             if (dist_forward > dist_right && dist_forward > dist_left) spin_by = 0;
                             else if (dist_right < dist_forward && dist_right < dist_left) spin_by *= -1;
-                            else spin_by *= 1; // Just for understanding
+                            else spin_by *= 1;
                         } else {
                             if (dist_forward >= dist_right && dist_forward >= dist_left) spin_by = 0;
                             else if (dist_right < dist_left) {
@@ -470,7 +497,19 @@ public class ZviAndGalAlgorithm implements BaseAlgo {
         }
 
     }
+    public Boolean relevantPoint() {
+        Lidar forward = drone.lidars.get(0);
+        double dist_forward = forward.current_distance;
 
+        Lidar right = drone.lidars.get(1);
+        double dist_right = right.current_distance;
+
+        Lidar left = drone.lidars.get(2);
+        double dist_left = left.current_distance;
+        if(dist_right > 300 && dist_left < 100 ) return true; // Right turn
+        if(dist_left > 300 && dist_right < 100 ) return true; // Left turn
+        return false;
+    }
     public Point getAvgLastPoint() {
         if (points.size() < 2) return currentPoint;
         else {
@@ -489,6 +528,17 @@ public class ZviAndGalAlgorithm implements BaseAlgo {
         if (points.size() == 0) return currentPoint;
         Point p = points.get(points.size() - 1);
         return p;
+    }
+
+    @Override
+    public double getBattery() {
+        Date diff = new Date(new Date().getTime() - this.startDate.getTime());
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(diff);
+        int seconds = calendar.get(Calendar.SECOND);
+        int minutes = calendar.get(Calendar.MINUTE);
+        return (minutes < 1) ? (60 - seconds) * 100/60 : -1;
     }
 }
 

@@ -11,6 +11,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+
+import static javax.swing.JOptionPane.showMessageDialog;
 
 public class SimulationWindow {
 
@@ -35,142 +38,13 @@ public class SimulationWindow {
     public static boolean return_home = false;
     boolean toogleStop = true;
 
+
     private void initialize() {
         frame = new JFrame();
-        frame.setSize(1800, 700);
+        frame.setSize(900, 700);
         frame.setTitle("Drone.Drone Simulator");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().setLayout(null);
-
-        /*
-         * Stop \ Resume
-         */
-
-        JButton stopBtn = new JButton("Start/Pause");
-        stopBtn.addActionListener(new ActionListener() {
-
-            public void actionPerformed(ActionEvent e) {
-                if (toogleStop) {
-                    CPU.stopAllCPUS();
-                } else {
-                    CPU.resumeAllCPUS();
-                }
-                toogleStop = !toogleStop;
-            }
-        });
-        stopBtn.setBounds(1300, 0, 170, 50);
-        frame.getContentPane().add(stopBtn);
-        /*
-         * Speeds
-         */
-
-        JButton speedBtn1 = new JButton("speedUp");
-        speedBtn1.addActionListener(e -> algorithm.speedUp());
-        speedBtn1.setBounds(1300, 100, 100, 50);
-        frame.getContentPane().add(speedBtn1);
-
-        JButton speedBtn2 = new JButton("speedDown");
-        speedBtn2.addActionListener(e -> algorithm.speedDown());
-        speedBtn2.setBounds(1400, 100, 100, 50);
-        frame.getContentPane().add(speedBtn2);
-
-        /*
-         * Spins
-         */
-
-        JButton spinBtn1 = new JButton("spin180");
-        spinBtn1.addActionListener(e -> algorithm.spinBy(180));
-        spinBtn1.setBounds(1300, 200, 100, 50);
-        frame.getContentPane().add(spinBtn1);
-
-        JButton spinBtn2 = new JButton("spin90");
-        spinBtn2.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                algorithm.spinBy(90);
-            }
-        });
-        spinBtn2.setBounds(1400, 200, 100, 50);
-        frame.getContentPane().add(spinBtn2);
-
-        JButton spinBtn3 = new JButton("spin60");
-        spinBtn3.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                algorithm.spinBy(60);
-            }
-        });
-        spinBtn3.setBounds(1500, 200, 100, 50);
-        frame.getContentPane().add(spinBtn3);
-
-        JButton spinBtn4 = new JButton("spin45");
-        spinBtn4.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                algorithm.spinBy(60);
-            }
-        });
-        spinBtn4.setBounds(1300, 300, 100, 50);
-        frame.getContentPane().add(spinBtn4);
-
-        JButton spinBtn5 = new JButton("spin30");
-        spinBtn5.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                algorithm.spinBy(30);
-            }
-        });
-        spinBtn5.setBounds(1400, 300, 100, 50);
-        frame.getContentPane().add(spinBtn5);
-
-        JButton spinBtn6 = new JButton("spin-30");
-        spinBtn6.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                algorithm.spinBy(-30);
-            }
-        });
-        spinBtn6.setBounds(1500, 300, 100, 50);
-        frame.getContentPane().add(spinBtn6);
-
-        JButton spinBtn7 = new JButton("spin-45");
-        spinBtn7.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                algorithm.spinBy(-45);
-            }
-        });
-        spinBtn7.setBounds(1600, 300, 100, 50);
-        frame.getContentPane().add(spinBtn7);
-
-        JButton spinBtn8 = new JButton("spin-60");
-        spinBtn8.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                algorithm.spinBy(-60);
-            }
-        });
-        spinBtn8.setBounds(1700, 300, 100, 50);
-        frame.getContentPane().add(spinBtn8);
-
-        /*
-         * Toogle real map
-         */
-
-        JButton toogleMapBtn = new JButton("toogle Map");
-        toogleMapBtn.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                toogleRealMap = !toogleRealMap;
-            }
-        });
-        toogleMapBtn.setBounds(1300, 400, 120, 50);
-        frame.getContentPane().add(toogleMapBtn);
-
-        /*
-         * Toogle AI
-         */
-
-        JButton toogleAIBtn = new JButton("toogle AI");
-        toogleAIBtn.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                toogleAI = !toogleAI;
-            }
-        });
-        toogleAIBtn.setBounds(1400, 400, 120, 50);
-        frame.getContentPane().add(toogleAIBtn);
 
         /*
          * RETURN TO HOME
@@ -182,24 +56,16 @@ public class SimulationWindow {
                 return_home = !return_home;
             }
         });
-        returnBtn.setBounds(1500, 400, 120, 50);
+        returnBtn.setBounds(10, 610, 120, 50);
         frame.getContentPane().add(returnBtn);
 
-        JButton Graph = new JButton("Open simulator.Graph");
-        Graph.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                algorithm.graph.drawGraph();
-            }
-        });
-        Graph.setBounds(1600, 400, 120, 50);
-        frame.getContentPane().add(Graph);
 
         /*
          * Info label
          */
 
         info_label = new JLabel();
-        info_label.setBounds(1300, 500, 300, 200);
+        info_label.setBounds(10, 475, 200, 150);
         frame.getContentPane().add(info_label);
 
         /*
@@ -207,7 +73,7 @@ public class SimulationWindow {
          */
 
         info_label2 = new JLabel();
-        info_label2.setBounds(1400, 450, 300, 200);
+        info_label2.setBounds(10, 370, 200, 150);
         frame.getContentPane().add(info_label2);
 
         main();
@@ -226,7 +92,7 @@ public class SimulationWindow {
 
         Map map = new Map(Config.root + "p1" + map_num + ".png", startPoints[map_num - 1]);
 
-        algorithm = new ZviAndGalAlgorithm(map);
+        algorithm = new ZviAndGalAlgorithm(map, frame);
 
         Painter painter = new Painter(algorithm);
         painter.setBounds(0, 0, 2000, 2000);
@@ -251,6 +117,8 @@ public class SimulationWindow {
         info_label.setText(algorithm.getDrone().getInfoHTML());
         info_label2.setText(
                 "<html>" +
+                        "<b>" + "Zvi Mints And Gal Hadida" + "</b><br>" +
+                        "<p style=\"color:red\">" + "Battery: " + algorithm.getBattery() + " % </p>" +
                         "Speed: " + algorithm.getSpeed() + "<br>"
                         + "distRight: " + algorithm.getDistRight() + "<br>"
                         + "distLeft: " + algorithm.getDistLeft() + "<br>"
