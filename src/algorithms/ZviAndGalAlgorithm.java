@@ -126,6 +126,7 @@ public class ZviAndGalAlgorithm implements BaseAlgo {
         }
     }
     public void DrawSmartLines(Graphics g) {
+        //todo: fix that
         if(smart_points.size() == 0) return;
         if(smart_points.size() == 1) return;
         for (int i = 0; i < smart_points.size(); i+=1) {
@@ -136,6 +137,7 @@ public class ZviAndGalAlgorithm implements BaseAlgo {
             if(nextP != null) {
                 g.setColor(Color.cyan);
                 g.drawLine((int)firstP.x,(int)firstP.y,(int)nextP.x,(int)nextP.y);
+                // todo: use g.drawString() for distance Tool.distanceBetweenPoints
             }
         }
     }
@@ -532,6 +534,7 @@ public class ZviAndGalAlgorithm implements BaseAlgo {
 
     }
     public Boolean relevantPoint() {
+        //Todo U-Turn
         Lidar forward = drone.lidars.get(0);
         double dist_forward = forward.current_distance;
 
@@ -540,6 +543,8 @@ public class ZviAndGalAlgorithm implements BaseAlgo {
 
         Lidar left = drone.lidars.get(2);
         double dist_left = left.current_distance;
+
+        // There a Turn - todo maybe combine dist_forward
         if(dist_right > 300 && dist_left < 100 ) return true; // Right turn
         if(dist_left > 300 && dist_right < 100 ) return true; // Left turn
         return false;
