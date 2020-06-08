@@ -8,7 +8,6 @@ import org.jgrapht.alg.spanning.KruskalMinimumSpanningTree;
 import org.jgrapht.ext.JGraphXAdapter;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
-import org.jgrapht.graph.DefaultWeightedEdge;
 
 import javax.swing.*;
 import java.util.Set;

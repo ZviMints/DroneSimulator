@@ -8,6 +8,7 @@ import java.util.Date;
 import cpu.CPU;
 import drone.Drone;
 import simulator.Func;
+import simulator.Graph;
 import simulator.Lidar;
 import map.Map;
 import map.Tools;
@@ -199,13 +200,13 @@ public class Algorithm implements BaseAlgo {
 			for(;j<map_size;j++) {
 				if(map[i][j] != PixelState.unexplored)  {
 					if(map[i][j] == PixelState.blocked) {
-						g.setColor(Color.RED);
+						//g.setColor(Color.RED);
 					} 
 					else if(map[i][j] == PixelState.explored) {
-						g.setColor(Color.YELLOW);
+						//g.setColor(Color.YELLOW);
 					}
 					else if(map[i][j] == PixelState.visited) {
-						g.setColor(Color.BLUE);
+						//g.setColor(Color.BLUE);
 					}
 					g.drawLine(i-startY, j-startX, i-startY, j-startX);
 				}

@@ -4,7 +4,6 @@ import java.awt.*;
 
 import javax.swing.JComponent;
 
-import algorithms.Algorithm;
 import algorithms.BaseAlgo;
 
 
@@ -18,7 +17,12 @@ public class Painter extends JComponent{
 	
 	@Override
 	public void paintComponent(Graphics g) {
+
 		super.paintComponent(g);
 		algo.paint(g);
 	}
+
+
+
+
 }

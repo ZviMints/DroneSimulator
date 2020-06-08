@@ -7,22 +7,21 @@ import map.Map;
 import map.Tools;
 import models.Point;
 import org.apache.commons.lang3.time.DateUtils;
-import simulator.Func;
-import simulator.Lidar;
-import simulator.SimulationWindow;
+import simulator.*;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.concurrent.locks.Lock;
 
 import static javax.swing.JOptionPane.showMessageDialog;
 
 public class ZviAndGalAlgorithm implements BaseAlgo {
+    public enum typesmart {slow,cross_section,Straight,U_turn,N}
 
     int map_size = 3000;
+    enum mapframe {sim,path}
 
     int lock_time = 5;
     Date lock = DateUtils.addSeconds(new Date(), lock_time);
@@ -31,7 +30,7 @@ public class ZviAndGalAlgorithm implements BaseAlgo {
     public Drone drone;
     public Point droneStartingPoint;
 
-    ArrayList<Point> points;
+    protected ArrayList<Point> points;
     ArrayList<Point> smart_points;
     public Date startDate;
 
@@ -41,7 +40,7 @@ public class ZviAndGalAlgorithm implements BaseAlgo {
 
     CPU cpu;
     Map map;
-    JFrame frame;
+    JFrame frame,GraphP;
     boolean justInitialized = true;
     public boolean risky = false;
     public int max_risky_distance = 150;
@@ -56,7 +55,9 @@ public class ZviAndGalAlgorithm implements BaseAlgo {
     double lastGyroRotation = 0;
 
     // =========================== Constructor =========================== //
-    public ZviAndGalAlgorithm(Map realMap, JFrame frame) {
+    public ZviAndGalAlgorithm(Map realMap, JFrame frame,JFrame  GraphP) {
+
+
         this.frame = frame;
         this.startDate = new Date();
         System.out.println("Initialize " + getAlgoName() + " Algorithm");
@@ -74,6 +75,7 @@ public class ZviAndGalAlgorithm implements BaseAlgo {
 
         this.map = realMap;
 
+        // Init map
         // Init map
         statesMap = new mapState[map_size][map_size];
         for (int i = 0; i < map_size; i++) {
@@ -105,7 +107,7 @@ public class ZviAndGalAlgorithm implements BaseAlgo {
             for (; j < map_size; j++) {
                 if (statesMap[i][j] != mapState.unexplored) {
                     if (statesMap[i][j] == mapState.blocked) {
-                        g.setColor(Color.RED);
+                      //  g.setColor(Color.RED);
                     } else if (statesMap[i][j] == mapState.explored) {
                         g.setColor(Color.YELLOW);
                     } else if (statesMap[i][j] == mapState.visited) {
@@ -127,27 +129,41 @@ public class ZviAndGalAlgorithm implements BaseAlgo {
     }
     public void DrawSmartLines(Graphics g) {
         //todo: fix that
+
         if(smart_points.size() == 0) return;
         if(smart_points.size() == 1) return;
-        for (int i = 0; i < smart_points.size(); i+=1) {
-            Point firstP = smart_points.get(i);
-            Point nextP = null;
-            if(i + 1 < smart_points.size())
-                nextP = smart_points.get(i+1);
-            if(nextP != null) {
-                g.setColor(Color.cyan);
-                g.drawLine((int)firstP.x,(int)firstP.y,(int)nextP.x,(int)nextP.y);
-                // todo: use g.drawString() for distance Tool.distanceBetweenPoints
-            }
-        }
+        GraphPath GP= new GraphPath(smart_points,drone);
+        GP.GV.setVisible(true);
+        SimulationWindow.draw_smart_lines=false;
+
     }
+
+//    public void DrawSmartLines(Graphics g) {
+//        //todo: fix that
+//        if(smart_points.size() == 0) return;
+//        if(smart_points.size() == 1) return;
+//        System.out.println(smart_points.size());
+//
+//        for (int i = 0; i < smart_points.size(); i+=1) {
+//            Point firstP = smart_points.get(i);
+//            Point nextP = null;
+//            if(i + 1 < smart_points.size())
+//                nextP = smart_points.get(i+1);
+//            if(nextP != null) {
+//                g.setColor(Color.RED);
+//                System.out.println("Draw lines");
+//                g.drawLine((int)firstP.x,(int)firstP.y,(int)nextP.x,(int)nextP.y);
+//                // todo: use g.drawString() for distance Tool.distanceBetweenPoints
+//            }
+//        }
+//    }
     public void paintSmartPoints(Graphics g) {
         for (int i = 0; i < smart_points.size(); i++) {
             Point p = smart_points.get(i);
-            g.setColor(Color.green);
+            g.setColor(p.col);
+            g.drawString(p.type,(int) p.x + (int) drone.startPoint.x - 10, (int) p.y + (int) drone.startPoint.y - 10);
             g.drawOval((int) p.x + (int) drone.startPoint.x - 10, (int) p.y + (int) drone.startPoint.y - 10, 20, 20);
-            if(i == smart_points.size() - 1)
-            g.drawString("Last",(int) p.x + (int) drone.startPoint.x - 10, (int) p.y + (int) drone.startPoint.y - 10);
+
 
         }
     }
@@ -157,9 +173,11 @@ public class ZviAndGalAlgorithm implements BaseAlgo {
         if(getBattery() < 0) {
             //todo: seperate gui and logic, can be done later
             frame.setVisible(false); //you can't see me!
+
             frame.dispose(); //Destroy the JFrame object
             cpu.stopAllCPUS();
-            showMessageDialog(null, "No Battery! Dammit");
+                showMessageDialog(null, "No Battery! Dammit");
+
             return;
         }
 
@@ -299,6 +317,7 @@ public class ZviAndGalAlgorithm implements BaseAlgo {
     // =========================== Override Functions =============================== //
     @Override
     public void paint(Graphics g) {
+
         if (SimulationWindow.toogleRealMap) drone.map.paint(g);
         if(SimulationWindow.draw_smart_lines) DrawSmartLines(g);
         paintBlindMap(g);
@@ -401,16 +420,43 @@ public class ZviAndGalAlgorithm implements BaseAlgo {
                 Point dronePoint = drone.getOpticalSensorLocation();
                 currentPoint = new Point(dronePoint);
                 points.add(dronePoint);
-                graph.addVertex(dronePoint);
+              //  graph.addVertex(dronePoint);
                 justInitialized = false;
             }
 
             Point dronePoint = drone.getOpticalSensorLocation();
 
+
+
+
             // Exercise 4
-            if(relevantPoint() && new Date().after(lock)) {
-                smart_points.add(dronePoint);
-                graph.addVertex(dronePoint);
+            if(typePoint()!=typesmart.N && new Date().after(lock)) {
+                Point p = new Point(dronePoint);
+                switch (typePoint())
+                {
+                    case slow:
+                        p.col=Color.blue;
+                        p.type="slow";
+                        break;
+                    case U_turn:
+                        p.col=Color.green;
+                        p.type="U_turn";
+                        break;
+                    case Straight:
+                        p.col=Color.red;
+                        p.type="Straight";
+                        break;
+                    case cross_section:
+                        p.col=Color.magenta;
+                        p.type="cross_section";
+                        break;
+                    default:
+                        p.type="null";
+                        p.col=Color.black;
+                }
+                smart_points.add(p);
+
+                //   graph.addVertex(dronePoint);
                 lock = DateUtils.addSeconds(lock, lock_time); // add seconds
 
 
@@ -418,7 +464,7 @@ public class ZviAndGalAlgorithm implements BaseAlgo {
             if (!(SimulationWindow.return_home)) {
                 if (Tools.getDistanceBetweenPoints(getLastPoint(), dronePoint) >= max_distance_between_points ){
                     points.add(dronePoint);
-                    graph.addVertex(dronePoint);
+                  //  graph.addVertex(dronePoint);
                 }
             } else { // SimulationWindow.return_home
                 if (points.isEmpty()) {
@@ -531,6 +577,24 @@ public class ZviAndGalAlgorithm implements BaseAlgo {
                 }
             }
         }
+
+    }
+    public typesmart typePoint() {
+        //Todo U-Turn
+        Lidar forward = drone.lidars.get(0);
+        double dist_forward = forward.current_distance;
+
+        Lidar right = drone.lidars.get(1);
+        double dist_right = right.current_distance;
+
+        Lidar left = drone.lidars.get(2);
+        double dist_left = left.current_distance;
+
+
+        if(drone.speed<0.5){ return  typesmart.slow;}
+        else if(dist_right>100 && dist_left>100){return  typesmart.cross_section;}
+        else if(dist_forward>250){return  typesmart.Straight;}
+        else{return  typesmart.N;}
 
     }
     public Boolean relevantPoint() {

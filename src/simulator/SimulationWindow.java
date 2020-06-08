@@ -17,15 +17,18 @@ import static javax.swing.JOptionPane.showMessageDialog;
 
 public class SimulationWindow {
 
-    private JFrame frame;
+    public JFrame frame;
+    public static Graphics dialog;
 
     public static void main(String[] args) {
         EventQueue.invokeLater(() -> {
             try {
                 SimulationWindow window = new SimulationWindow();
+
                 window.frame.setVisible(true);
             } catch (Exception e) {
-                e.printStackTrace();
+                System.out.println("t");
+
             }
         });
     }
@@ -38,11 +41,15 @@ public class SimulationWindow {
     public static boolean return_home = false;
     public static boolean speed_logs = false;
     public static boolean draw_smart_lines = false;
+    public static boolean draw_graph = false;
+
     boolean toogleStop = true;
 
 
     private void initialize() {
         frame = new JFrame();
+
+
         frame.setSize(900, 700);
         frame.setTitle("Drone.Drone Simulator");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -69,7 +76,22 @@ public class SimulationWindow {
         JButton drawEdges = new JButton("Draw Edges");
         drawEdges.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+
+//              //  JFrame gpt=new JFrame();
+//             //   dialog = gpt.getGraphics();
+//                gpt.setVisible(true);
+//                gpt.setSize(900, 700);
+//                gpt.setTitle("Drone.Drone Simulator");
+//              //  gpt.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//                draw_graph=true;
+//                gpt.getContentPane().setLayout(null);
+//                CPU paintGraph = new CPU(200, "paintGraph"); // 60 FPS painter
+//                paintGraph.addFunction(gpt::repaint);
+//
+//                System.out.println(gpt.getGraphics());
+
                 draw_smart_lines = !draw_smart_lines;
+
             }
         });
         drawEdges.setBounds(140, 610, 120, 50);
@@ -122,22 +144,20 @@ public class SimulationWindow {
 
         Map map = new Map(Config.root + "p1" + map_num + ".png", startPoints[map_num - 1]);
 
-        algorithm = new ZviAndGalAlgorithm(map, frame);
+
+        algorithm = new ZviAndGalAlgorithm(map, frame,null);
 
         Painter painter = new Painter(algorithm);
+
         painter.setBounds(0, 0, 2000, 2000);
         frame.getContentPane().add(painter);
-
         CPU painterCPU = new CPU(200, "painter"); // 60 FPS painter
         painterCPU.addFunction(frame::repaint);
         painterCPU.play();
-
         algorithm.play();
-
         CPU updatesCPU = new CPU(60, "updates");
         updatesCPU.addFunction(algorithm.getDrone()::update);
         updatesCPU.play();
-
         CPU infoCPU = new CPU(6, "update_info");
         infoCPU.addFunction(this::updateInfo);
         infoCPU.play();

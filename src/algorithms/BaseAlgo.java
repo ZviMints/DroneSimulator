@@ -7,7 +7,7 @@ import simulator.Graph;
 import java.awt.*;
 
 public interface BaseAlgo {
-    enum mapState {blocked, explored, unexplored, visited}
+    enum mapState {blocked, explored, unexplored, visited,lines}
     String getAlgoName();
     double getDistRight();
     double getDistLeft();
@@ -23,6 +23,7 @@ public interface BaseAlgo {
     void spinBy(double degrees);
     void paint(Graphics g);
     Drone getDrone();
+     Graph graph = new Graph();
 
-    Graph graph = new Graph();
+
 }

@@ -23,6 +23,7 @@ public class CPU {
         thread = new Thread("Eventor_" + name) {
             public void run() {
                 try {
+                    System.out.println(this.toString()+" "+ this.getName());
                     Thread.sleep(10);
                 } catch (InterruptedException e) {
                 }
@@ -43,6 +44,7 @@ public class CPU {
             all_cpus.get(i).isPlay = false;
         }
     }
+
 
     public static void resumeAllCPUS() {
         for (int i = 0; i < all_cpus.size(); i++) {
